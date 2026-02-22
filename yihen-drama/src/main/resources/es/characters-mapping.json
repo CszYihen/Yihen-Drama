@@ -1,0 +1,65 @@
+{
+  "dynamic": "false",
+  "properties": {
+
+    "id": {
+      "type": "long"
+    },
+
+    "projectId": {
+      "type": "long"
+    },
+
+    "episodeId": {
+      "type": "long"
+    },
+
+    "name": {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
+      "fields": {
+
+        "kw": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+
+        "pinyin": {
+          "type": "text",
+          "analyzer": "pinyin_analyzer"
+        }
+      }
+    },
+
+    "description": {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
+    },
+
+    "avatar": {
+      "type": "keyword",
+      "index": false
+    },
+
+    "videoUrl": {
+      "type": "keyword",
+      "index": false
+    },
+
+    "features": {
+      "type": "object",
+      "enabled": true
+    },
+
+    "createTime": {
+      "type": "date"
+    },
+
+    "updateTime": {
+      "type": "date"
+    }
+
+  }
+}

@@ -1,0 +1,8 @@
+.git
+.idea
+target
+sql
+*.log
+*.txt
+*.mp3
+*.iml

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihen.mapper.ProjectMapper">
+
+
+        <!-- 主 resultMap -->
+        <resultMap id="ExtractionResultMap" type="com.yihen.controller.vo.ExtractionResultVO">
+
+            <!-- characters 子集合 -->
+            <collection property="characters"
+                        ofType="com.yihen.entity.Characters"
+                        column="project_id"
+                        select="selectCharactersByProjectId"/>
+
+            <!-- scenes 子集合 -->
+            <collection property="scenes"
+                        ofType="com.yihen.entity.Scene"
+                        column="project_id"
+                        select="selectScenesByProjectId"/>
+
+        </resultMap>
+
+        <!-- 主查询（只需要 projectId） -->
+        <select id="getPropertyById" resultMap="ExtractionResultMap">
+            SELECT #{projectId} AS project_id
+        </select>
+
+        <!-- 子查询 1 -->
+        <select id="selectCharactersByProjectId" resultType="com.yihen.entity.Characters">
+            SELECT *
+            FROM characters
+            WHERE project_id = #{project_id} AND is_deleted = 0
+        </select>
+
+        <!-- 子查询 2 -->
+        <select id="selectScenesByProjectId" resultType="com.yihen.entity.Scene">
+            SELECT *
+            FROM scene
+            WHERE project_id = #{project_id} AND is_deleted = 0
+        </select>
+
+
+</mapper>

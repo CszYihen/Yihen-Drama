@@ -1,0 +1,54 @@
+server:
+  port: 8080
+
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    virtual-host: /
+    username: yihen
+    password: yihen0214
+    listener:
+      simple:
+        prefetch: 1 # 每次只能获取一条消息，处理完成才能获取下一个消息。解决消息堆积问题
+  elasticsearch:
+    uris: http://localhost:9200
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:${SPRING_REDIS_HOST:localhost}}
+      port: ${SPRING_DATA_REDIS_PORT:${SPRING_REDIS_PORT:6379}}
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 50MB
+  codec :
+      max-in-memory-size: 5242880
+  jackson:
+    # 全局配置时间格式
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  datasource: # mysql数据库配置
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/YihenDrama?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2b8
+    username: root
+    password: yihen0214
+
+logging:
+  level:
+    org.springframework.web.reactive.function.client.WebClient: DEBUG
+
+# minio配置
+minio:
+  access-key: minioadmin
+  end-point: http://127.0.0.1:9000
+  secret-key: minioadmin
+#用于打印框架生成的sql语句，便于调试
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    auto-mapping-behavior: full # 深层次映射
+  global-config:
+    db-config:
+      logic-delete-field: isDeleted #逻辑删除字段
+      logic-delete-value: 1
+      logic-not-delete-value: 0

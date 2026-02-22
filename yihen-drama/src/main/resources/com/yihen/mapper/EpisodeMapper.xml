@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihen.mapper.EpisodeMapper">
+
+
+    <resultMap id="EpisodeBaseResultMap" type="com.yihen.entity.Episode">
+        <id column="id" property="id"/>
+        <result column="project_id" property="projectId"/>
+        <result column="chapter_number" property="chapterNumber"/>
+        <result column="name" property="name"/>
+        <result column="status" property="status"/>
+        <result column="progress" property="progress"/>
+        <result column="current_step" property="currentStep"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+
+        <!-- 故意不映射 content -->
+    </resultMap>
+
+    <select id="getEpisodesByProjectId" resultMap="EpisodeBaseResultMap">
+        SELECT
+        id,
+        project_id,
+        chapter_number,
+        name,
+        status,
+        progress,
+        current_step,
+        create_time,
+        update_time
+        FROM episode
+        WHERE project_id = #{projectId}
+        AND is_deleted = 0
+        ORDER BY chapter_number ASC
+    </select>
+
+</mapper>

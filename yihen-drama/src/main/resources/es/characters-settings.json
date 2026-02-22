@@ -1,0 +1,22 @@
+{
+  "analysis": {
+    "analyzer": {
+      "pinyin_analyzer": {
+        "type": "custom",
+        "tokenizer": "ik_max_word",
+        "filter": ["lowercase", "pinyin_filter"]
+      }
+    },
+    "filter": {
+      "pinyin_filter": {
+        "type": "pinyin",
+        "keep_first_letter": true,
+        "keep_separate_first_letter": true,
+        "keep_full_pinyin": true,
+        "keep_original": true,
+        "lowercase": true,
+        "remove_duplicated_term": true
+      }
+    }
+  }
+}

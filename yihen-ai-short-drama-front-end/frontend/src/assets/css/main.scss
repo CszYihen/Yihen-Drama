@@ -1,0 +1,439 @@
+// 黑金高级主题配色 - 鎏金烫金奢华版
+:root {
+  // 主色调 - 黑金/鎏金/烫金系
+  --primary: #D4AF37;
+  --accent: #F4E4BA;
+  --gold-primary: #D4AF37;
+  --gold-light: #F4E4BA;
+  --gold-dark: #B8860B;
+  --gold-shine: #FFD700;
+  --gold-muted: #C9A962;
+  
+  // 金色渐变
+  --gold-gradient: linear-gradient(135deg, #F4E4BA 0%, #D4AF37 50%, #B8860B 100%);
+  --gold-gradient-shine: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
+  --gold-glow: rgba(212, 175, 55, 0.4);
+  
+  // 辅助色 - 玫瑰金
+  --rose-gold: #E8C49A;
+  --rose-gold-light: #F5DFC5;
+  
+  // 古铜色
+  --bronze: #CD7F32;
+  --bronze-dark: #8B4513;
+  
+  // 状态色
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #06B6D4;
+  
+  // 背景色 - 深邃奢华鎏金氛围
+  --bg-primary: #0D0B08;
+  --bg-secondary: #14120F;
+  --bg-tertiary: #1C1814;
+  --bg-card: rgba(28, 24, 20, 0.85);
+  --bg-glass: rgba(212, 175, 55, 0.03);
+  --bg-deep: #080704;
+  --bg-gold-mesh: rgba(212, 175, 55, 0.02);
+  
+  // 文字色
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.85);
+  --text-tertiary: rgba(255, 255, 255, 0.55);
+  --text-muted: rgba(255, 255, 255, 0.3);
+  --text-gold: #F4E4BA;
+  
+  // 边框色 - 金属质感
+  --border-color: rgba(212, 175, 55, 0.12);
+  --border-hover: rgba(212, 175, 55, 0.25);
+  --border-gold: rgba(212, 175, 55, 0.3);
+  
+  // 阴影
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
+  --shadow-gold: 0 0 30px rgba(212, 175, 55, 0.15);
+  --shadow-gold-lg: 0 0 50px rgba(212, 175, 55, 0.25);
+  
+  // 圆角
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+  
+  // 动画
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+// 全局样式
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(180deg, #0D0B08 0%, #14120F 100%);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+// 背景装饰 - 柔和金色光晕
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at 50% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+// 滚动条样式
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1815;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8B7355;
+  border-radius: 5px;
+  border: 2px solid #1a1815;
+  
+  &:hover {
+    background: #D4AF37;
+  }
+}
+
+// 通用类
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-sm {
+  gap: 8px;
+}
+
+.gap-md {
+  gap: 16px;
+}
+
+.gap-lg {
+  gap: 24px;
+}
+
+// 卡片样式 - 黑金风格
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(20px);
+  transition: all var(--transition-base);
+  
+  &:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-gold);
+  }
+}
+
+// 按钮样式 - 金色主题
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+  height: auto;
+  
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  &-primary {
+    background: var(--gold-gradient);
+    color: #1C1814;
+    font-weight: 600;
+    box-shadow: 0 4px 20px var(--gold-glow);
+    
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--gold-glow);
+    }
+  }
+  
+  &-secondary {
+    background: var(--bg-tertiary);
+    color: var(--gold-light);
+    border: 1px solid var(--border-color);
+    
+    &:hover:not(:disabled) {
+      background: var(--bg-glass);
+      border-color: var(--border-gold);
+      box-shadow: var(--shadow-gold);
+    }
+  }
+  
+  &-ghost {
+    background: transparent;
+    color: var(--gold-light);
+    
+    &:hover:not(:disabled) {
+      background: var(--bg-glass);
+      border-color: var(--border-gold);
+    }
+  }
+}
+
+// 输入框样式
+.input {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-base);
+  
+  &::placeholder {
+    color: var(--text-muted);
+  }
+  
+  &:focus {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 0 3px var(--gold-glow);
+  }
+}
+
+// 标题样式 - 金色点缀
+.title {
+  font-weight: 600;
+  color: var(--text-primary);
+  
+  &-h1 {
+    font-size: 32px;
+    line-height: 1.2;
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  &-h2 {
+    font-size: 24px;
+    line-height: 1.3;
+    color: var(--text-primary);
+  }
+  
+  &-h3 {
+    font-size: 18px;
+    line-height: 1.4;
+    color: var(--gold-light);
+  }
+}
+
+// 进度条 - 金色主题
+.progress {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  
+  &-bar {
+    height: 100%;
+    background: var(--gold-gradient);
+    border-radius: var(--radius-full);
+    transition: width var(--transition-slow);
+  }
+}
+
+// 标签 - 金色主题
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  background: var(--bg-glass);
+  color: var(--gold-light);
+  
+  &-primary {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--gold-light);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+  }
+  
+  &-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+  }
+  
+  &-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning);
+  }
+}
+
+// 骨架屏
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-tertiary) 25%,
+    rgba(212, 175, 55, 0.1) 50%,
+    var(--bg-tertiary) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// 动画
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes gold-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.6);
+  }
+}
+
+@keyframes gold-shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(212, 175, 55, 0.2) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-gold-pulse {
+  animation: gold-pulse 2s ease-in-out infinite;
+}

@@ -1,0 +1,172 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: yihen-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: yihen0214
+      MYSQL_DATABASE: YihenDrama
+      TZ: Asia/Shanghai
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./yihen-drama/sql/init_schema.sql:/docker-entrypoint-initdb.d/01-init_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: yihen-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mq:
+    image: rabbitmq:4.2-management
+    container_name: yihen-mq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: yihen
+      RABBITMQ_DEFAULT_PASS: yihen0214
+      TZ: Asia/Shanghai
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:RELEASE.2024-03-30T09-41-56Z
+    container_name: yihen-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      TZ: Asia/Shanghai
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  es:
+    build:
+      context: ./yihen-drama/docker/elasticsearch
+      dockerfile: Dockerfile
+      args:
+        ES_BASE_IMAGE: docker.1ms.run/library/elasticsearch:8.11.3
+        IK_PLUGIN_URL: https://get.infini.cloud/elasticsearch/analysis-ik/8.11.3
+        PINYIN_PLUGIN_URL: https://get.infini.cloud/elasticsearch/analysis-pinyin/8.11.3
+    image: yihen-elasticsearch:8.11.3-ik-pinyin
+    container_name: yihen-es
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      TZ: Asia/Shanghai
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  kibana:
+    image: kibana:8.11.3
+    container_name: yihen-kibana
+    restart: unless-stopped
+    environment:
+      ELASTICSEARCH_HOSTS: http://es:9200
+      TZ: Asia/Shanghai
+    depends_on:
+      es:
+        condition: service_healthy
+    ports:
+      - "5601:5601"
+
+  backend:
+    build:
+      context: ./yihen-drama
+      dockerfile: Dockerfile
+      args:
+        MAVEN_IMAGE: docker.1ms.run/library/maven:3.9.9-eclipse-temurin-17
+        JRE_IMAGE: docker.1ms.run/library/eclipse-temurin:17-jre
+    container_name: yihen-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mq:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      es:
+        condition: service_healthy
+    environment:
+      TZ: Asia/Shanghai
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/YihenDrama?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2b8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: yihen0214
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_RABBITMQ_HOST: mq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: yihen
+      SPRING_RABBITMQ_PASSWORD: yihen0214
+      SPRING_ELASTICSEARCH_URIS: http://es:9200
+      MINIO_END_POINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./yihen-ai-short-drama-front-end/frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ""
+    container_name: yihen-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "3000:3000"
+
+volumes:
+  mysql_data:
+  redis_data:
+  minio_data:
+  es_data:

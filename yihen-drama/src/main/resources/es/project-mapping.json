@@ -1,0 +1,22 @@
+{
+  "properties": {
+    "id": { "type": "long" },
+    "name": {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
+      "fields": {
+        "kw": { "type": "keyword", "ignore_above": 256 },
+        "pinyin": { "type": "text", "analyzer": "pinyin_analyzer" }
+      }
+    },
+    "description": { "type": "text", "analyzer": "ik_max_word", "search_analyzer": "ik_smart" },
+    "cover": { "type": "keyword", "index": false },
+    "styleId": { "type": "long" },
+    "status": { "type": "integer" },
+    "chapterCount": { "type": "integer" },
+    "progress": { "type": "integer" },
+    "createTime": { "type": "date" },
+    "updateTime": { "type": "date" }
+  }
+}
