@@ -2478,6 +2478,19 @@ const loadEpisodeContent = async (episodeId, forceStepZero = false) => {
         // 正常加载时使用后端返回的步骤
         if (typeof episode.currentStep === 'number') {
           currentStep.value = episode.currentStep
+        } else if (typeof episode.currentStep === 'string' && !Number.isNaN(Number(episode.currentStep))) {
+          currentStep.value = Number(episode.currentStep)
+        } else if (typeof episode.currentStep === 'string') {
+          const stepKeyMap = {
+            INPUT_CONTENT: 0,
+            EXTRACT_INFO: 1,
+            GENERATE_IMAGES: 2,
+            CHARACTER_FIX: 3,
+            GENERATE_STORYBOARD: 4,
+            GENERATE_VIDEO: 5,
+            COMPLETED: 6
+          }
+          currentStep.value = stepKeyMap[episode.currentStep] ?? 0
         } else if (episode.currentStep && typeof episode.currentStep === 'object' && episode.currentStep.code !== undefined) {
           currentStep.value = episode.currentStep.code
         } else {
@@ -2553,7 +2566,7 @@ const generateCharacterImage = async (character, actionType) => {
 
     const requestData = {
       modelInstanceId: defaultModel.id,
-      charcterId: character.id,
+      characterId: character.id,
       projectId: projectId,
       description: character.description || `${character.name}的形象描述`
     }
@@ -2614,7 +2627,7 @@ const submitBatchGenerateCharacters = async (characterList) => {
 
     const requestList = validCharacters.map(character => ({
       modelInstanceId: defaultModel.id,
-      charcterId: character.id,
+      characterId: character.id,
       projectId: projectId,
       description: character.description || `${character.name}的形象描述`
     }))
@@ -2677,7 +2690,7 @@ const generateCharacterVideo = async (character) => {
     const response = await episodeApi.generateCharacterVideo({
       modelInstanceId,
       episodeId: activeEpisode.value,
-      charcterId: character.id,
+      characterId: character.id,
       projectId: projectId
     })
     

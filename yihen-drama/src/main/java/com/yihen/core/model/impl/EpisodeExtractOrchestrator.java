@@ -95,18 +95,13 @@ public class EpisodeExtractOrchestrator {
             s.setEpisodeId(episode.getId());
             s.setProjectId(episode.getProjectId());
         });
+        // 4. 保存对应信息
+        characterService.saveBatch(extract.getCharacters().stream().filter(Characters::isNew).toList());
+        sceneService.saveBatch(extract.getScenes().stream().filter(Scene::isNew).toList());
 
         // 创建异步任务，异步更新数据库
-        CompletableFuture.runAsync(() -> {
-            // 过滤已经出现的角色和场景
+        episodePersistFacade.updateEpisodeCurrentStepAsync(episode,EpisodeStep.EXTRACT_INFO);
 
-            // 4. 保存对应信息
-            characterService.saveBatch(extract.getCharacters().stream().filter(Characters::isNew).toList());
-            sceneService.saveBatch(extract.getScenes().stream().filter(Scene::isNew).toList());
-            // 5. 修改章节状态
-            episode.setCurrentStep(EpisodeStep.GENERATE_IMAGES);
-            episodeService.updateById(episode);
-        }, episodeExecutor);
 
         return extract;
     }
@@ -155,7 +150,7 @@ public class EpisodeExtractOrchestrator {
         if (ObjectUtils.isEmpty(charactersRequestVO.getModelInstanceId())) {
             throw new RuntimeException("模型实例id不能为空");
         }
-        if (ObjectUtils.isEmpty(charactersRequestVO.getCharcterId())) {
+        if (ObjectUtils.isEmpty(charactersRequestVO.getCharacterId())) {
             throw new RuntimeException("角色id不能为空");
         }
         if (ObjectUtils.isEmpty(charactersRequestVO.getProjectId())) {
@@ -171,7 +166,7 @@ public class EpisodeExtractOrchestrator {
         videoTask.setProjectId(charactersRequestVO.getProjectId());
         videoTask.setTaskId(taskId);
         videoTask.setInstanceId(charactersRequestVO.getModelInstanceId());
-        videoTask.setTargetId(charactersRequestVO.getCharcterId());
+        videoTask.setTargetId(charactersRequestVO.getCharacterId());
         videoTask.setNextPollAt(Date.from(Instant.now()));
         videoTask.setPollCount(0);
         videoTask.setStatus("QUEUED");

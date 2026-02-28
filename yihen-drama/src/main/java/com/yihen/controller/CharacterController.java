@@ -109,7 +109,7 @@ public class CharacterController {
                     Map<String, Object> payload = new HashMap<>();
                     payload.put("bizType", "CHARACTER_IMAGE_BATCH");
                     payload.put("status", "FAIL");
-                    payload.put("targetId", request.getCharcterId());
+                    payload.put("targetId", request.getCharacterId());
                     payload.put("projectId", request.getProjectId());
                     payload.put("errorMessage", throwable.getMessage());
                     taskStatusWebSocketHandler.sendInfo(request.getProjectId(), payload);

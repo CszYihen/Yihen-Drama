@@ -77,7 +77,7 @@ public class VolcanoVideoModelStrategy implements VideoModelStrategy {
         }
         body.put("model", modelInstance.getModelCode());
 
-        Object content = buildBody(charactersRequestVO.getCharcterId(), charactersRequestVO.getDescription());
+        Object content = buildBody(charactersRequestVO.getCharacterId(), charactersRequestVO.getDescription());
 
         body.put("content", content);
 

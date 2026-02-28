@@ -2,7 +2,9 @@ package com.yihen.asyn;
 
 import com.yihen.config.properties.MinioProperties;
 import com.yihen.constant.MinioConstant;
+import com.yihen.constant.episode.EpisodeRedisConstant;
 import com.yihen.constant.project.ProjectRedisConstant;
+import com.yihen.controller.vo.ExtractionResultVO;
 import com.yihen.entity.*;
 import com.yihen.enums.EpisodeStep;
 import com.yihen.http.HttpExecutor;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class EpisodePersistFacade {
@@ -105,9 +108,11 @@ public class EpisodePersistFacade {
         // 修改章节状态
         Long episodeId = scene_.getEpisodeId();
         Episode episode = episodeMapper.selectById(episodeId);
-        if (episode.getCurrentStep().getCode().equals(EpisodeStep.EXTRACT_INFO.getCode())) {
+        if (episode.getCurrentStep().getCode() < EpisodeStep.GENERATE_IMAGES.getCode()) {
             episode.setCurrentStep(EpisodeStep.GENERATE_IMAGES);
             episodeMapper.updateById(episode);
+            // 更新章节缓存
+            redisUtils.updateHashPartial(EpisodeRedisConstant.EPISODE_INFO_KEY + episode.getId(), episode);
         }
     }
 
@@ -129,10 +134,34 @@ public class EpisodePersistFacade {
         // 修改章节状态
         Long episodeId = characters_.getEpisodeId();
         Episode episode = episodeMapper.selectById(episodeId);
-        if (episode.getCurrentStep().getCode().equals(EpisodeStep.EXTRACT_INFO.getCode())) {
+        if (episode.getCurrentStep().getCode() < EpisodeStep.GENERATE_IMAGES.getCode()) {
             episode.setCurrentStep(EpisodeStep.GENERATE_IMAGES);
             episodeMapper.updateById(episode);
+            // 更新章节缓存
+            redisUtils.updateHashPartial(EpisodeRedisConstant.EPISODE_INFO_KEY + episode.getId(), episode);
+
         }
+
+    }
+
+
+    /**
+     * 异步执行，但事务仍然有效（关键：方法在 Spring Bean 上）
+     * 保存提取的资产信息
+     */
+    @Async("episodeExecutor") // 你已有线程池的话配置成 Spring Async Executor
+    @Transactional(rollbackFor = Exception.class)
+    public void updateEpisodeCurrentStepAsync( Episode episode, EpisodeStep episodeStep) throws Exception {
+
+        // 5. 修改章节状态
+        if (episode.getCurrentStep().getCode() < episodeStep.getCode()) {
+            episode.setCurrentStep(episodeStep);
+            episodeMapper.updateById(episode);
+            // 更新章节缓存
+            redisUtils.updateHashPartial(EpisodeRedisConstant.EPISODE_INFO_KEY + episode.getId(), episode);
+
+        }
+
 
     }
 

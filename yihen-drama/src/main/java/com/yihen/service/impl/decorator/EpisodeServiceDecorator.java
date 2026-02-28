@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@Primary // 让业务默认注入到“带缓存的实现”
+@Primary // 让业务默认注入到“带缓存的实现�?
 @Slf4j
 public class EpisodeServiceDecorator extends ServiceImpl<EpisodeMapper, Episode> implements EpisodeService {
 
-    private final EpisodeService episodeService;            // 被装饰者
+    private final EpisodeService episodeService;            // 被装饰�?
     private final RedisUtils redisUtils;
 
 
@@ -36,7 +36,7 @@ public class EpisodeServiceDecorator extends ServiceImpl<EpisodeMapper, Episode>
 
     @Override
     public List<Episode> getEpisodesByProjectId(Long projectId) {
-        // 1. 查询缓存，是否存在对应数据
+        // 1. 查询缓存，是否存在对应数�?
         List<Episode> episodes =(List<Episode>) redisUtils.get(ProjectRedisConstant.PROJECT_EPISODES_KEY + projectId);
         if (ObjectUtils.isEmpty(episodes)) {
             // 2. 缓存为空，查询数据库
@@ -96,8 +96,7 @@ public class EpisodeServiceDecorator extends ServiceImpl<EpisodeMapper, Episode>
             redisUtils.putHash(EpisodeRedisConstant.EPISODE_INFO_KEY + id, episode,1 , TimeUnit.DAYS);
         }
 
-        return episode;
-    }
+        return episode;    }
 
     @Override
     public void updateEpisode(Episode episode) {
