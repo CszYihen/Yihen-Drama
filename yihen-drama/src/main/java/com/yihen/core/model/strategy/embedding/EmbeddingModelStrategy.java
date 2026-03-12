@@ -5,6 +5,8 @@ import com.yihen.controller.vo.EmbeddingModelRequestVO;
 import com.yihen.controller.vo.ImageModelRequestVO;
 import com.yihen.entity.ModelInstance;
 
+import java.util.List;
+
 /**
  * 向量模型策略接口
  * 统一各厂商图像生成服务的调用方式
@@ -14,7 +16,7 @@ public interface EmbeddingModelStrategy {
      * 文本生成向量
      * @param embeddingModelRequestVO 图像信息
      */
-    String create(EmbeddingModelRequestVO embeddingModelRequestVO) throws Exception;
+    List<List<Float>> create(EmbeddingModelRequestVO embeddingModelRequestVO) throws Exception;
 
 
 

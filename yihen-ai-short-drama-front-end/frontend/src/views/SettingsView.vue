@@ -301,7 +301,7 @@
           </div>
           
           <!-- 高级设置折叠面板 -->
-          <div class="advanced-section">
+          <div class="advanced-section" v-if="activeModelType !== 'vector'">
             <button class="advanced-toggle" @click="toggleAdvanced(activeModelType)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"/>
@@ -398,39 +398,6 @@
                 </div>
               </template>
 
-              <!-- 向量模型高级设置 -->
-              <template v-if="activeModelType === 'vector'">
-                <div class="config-row">
-                  <label class="config-label">向量维度</label>
-                  <input
-                    type="number"
-                    class="config-input"
-                    min="1"
-                    step="1"
-                    v-model.number="currentConfig.config.dimension"
-                    placeholder="如: 1024"
-                  />
-                </div>
-                <div class="config-row">
-                  <label class="config-label">距离度量</label>
-                  <select class="config-select" v-model="currentConfig.config.metric">
-                    <option value="cosine">Cosine</option>
-                    <option value="dot">Dot Product</option>
-                    <option value="euclidean">Euclidean</option>
-                  </select>
-                </div>
-                <div class="config-row">
-                  <label class="config-label">检索 TopK</label>
-                  <input
-                    type="number"
-                    class="config-input"
-                    min="1"
-                    step="1"
-                    v-model.number="currentConfig.config.topK"
-                    placeholder="如: 5"
-                  />
-                </div>
-              </template>
             </div>
           </div>
           

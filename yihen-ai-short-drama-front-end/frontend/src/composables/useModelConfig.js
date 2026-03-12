@@ -286,10 +286,6 @@ export function useModelConfig() {
     } else if (uiData.type === 'audio') {
       params.voice = uiData.config?.voice || 'zh-CN-Xiaoxiao'
       params.speed = Number(uiData.config?.speed) || 1.0
-    } else if (uiData.type === 'vector') {
-      params.dimension = Number(uiData.config?.dimension) || 1024
-      params.metric = uiData.config?.metric || 'cosine'
-      params.topK = Number(uiData.config?.topK) || 10
     }
 
     return {

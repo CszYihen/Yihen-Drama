@@ -43,6 +43,17 @@ minio:
   access-key: ${MINIO_ACCESS_KEY:minioadmin}
   end-point: ${MINIO_END_POINT:http://127.0.0.1:9000}
   secret-key: ${MINIO_SECRET_KEY:minioadmin}
+
+qdrant:
+  host: localhost
+  port: 6334
+  collection-name: novel_content
+  dimension: 384
+  max-segmentSize-in-tokens: 300
+  max-overlap-size-in-tokens: 30
+  max-result: 5
+  min-score: 0.8
+
 #用于打印框架生成的sql语句，便于调试
 mybatis-plus:
   configuration:

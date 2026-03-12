@@ -29,8 +29,29 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-embeddings-all-minilm-l6-v2</artifactId>
+        </dependency>
 
+        <!--langchain4j整合向量数据库Qdrant-->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-qdrant</artifactId>
+            <version>1.12.1-beta21</version>
+        </dependency>
 
+        <!-- 文本切分 -->
+        <dependency>
+        <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-easy-rag</artifactId>
+        </dependency>
+
+        <!--PDF文档解析器-->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-document-parser-apache-pdfbox</artifactId>
+        </dependency>
         <!--AMQP依赖，包含RabbitMQ-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -181,7 +202,14 @@
                 <scope>import</scope>
             </dependency>
 
-
+            <!--引入langchain4j依赖管理清单-->
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-bom</artifactId>
+                <version>${langchain4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

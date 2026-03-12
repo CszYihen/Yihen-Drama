@@ -1,5 +1,6 @@
 package com.yihen.core.model.strategy.embedding.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yihen.config.properties.MinioProperties;
 import com.yihen.constant.MinioConstant;
@@ -19,10 +20,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -47,7 +45,7 @@ public class VolcanoEmbeddingModelStrategy implements EmbeddingModelStrategy {
 
 
     // 响应结果提取
-    private String extractResponse(String response) throws Exception {
+    private  List<List<Float>> extractResponse(String response) throws Exception {
 
         // 1. 转成JSONObject对象
         JSONObject jsonObject = JSONObject.parseObject(response);
@@ -57,20 +55,63 @@ public class VolcanoEmbeddingModelStrategy implements EmbeddingModelStrategy {
             throw new Exception(errorMessage);
         }
 
-        String content = jsonObject.getJSONArray("data")
-                .getJSONObject(0).getString("url");
+        JSONArray dataArray = jsonObject.getJSONObject("data").getJSONArray("embedding");
 
-        if (org.springframework.util.ObjectUtils.isEmpty(content)) {
-            throw new Exception("返回结果结构正确，但是返回数据为空！再次尝试");
+        // 3. 存储 embedding
+        List<List<Float>> embeddings = new ArrayList<>();
+
+        for (int i = 0; i < dataArray.size(); i++) {
+
+            JSONObject item = dataArray.getJSONObject(i);
+
+            JSONArray embeddingArray = item.getJSONArray("embedding");
+
+            List<Float> embedding = new ArrayList<>();
+
+            for (int j = 0; j < embeddingArray.size(); j++) {
+                embedding.add(embeddingArray.getFloat(j));
+            }
+
+            embeddings.add(embedding);
         }
 
-        return content;
+
+
+
+        return embeddings;
 
     }
 
     @Override
-    public String create(EmbeddingModelRequestVO embeddingModelRequestVO) throws Exception {
-        return "";
+    public  List<List<Float>> create(EmbeddingModelRequestVO embeddingModelRequestVO) throws Exception {
+        // 1. 获取模型实例
+        ModelInstance modelInstance = modelManageService.getModelInstanceById(embeddingModelRequestVO.getModelInstanceId());
+
+        // 2. 获取厂商定义的baseurl
+        String baseUrl = modelDefinitionMapper.getBaseUrlById(modelInstance.getModelDefId());
+
+        // 3. 拼接发送请求信息
+        HashMap<String, Object> body = (HashMap<String, Object>) modelInstance.getParams();
+        if (ObjectUtils.isEmpty(body)) {
+            body = new HashMap<>();
+        }
+        body.put("model", modelInstance.getModelCode());
+
+        // 将input组织为 火山引擎 合适格式
+        List<HashMap<String, String>> list = embeddingModelRequestVO.getInput().stream()
+                .map(input -> {
+                    HashMap<String, String> map = new HashMap<>();
+                    map.put("type", "text");
+                    map.put("text", input);
+                    return map;
+                }).toList();
+        body.put("input", list);
+
+        // 3. 发送请求
+        String response = httpExecutor.post(baseUrl, modelInstance.getPath(), modelInstance.getApiKey(), body).block();
+
+        // 4. 解析结果
+        return extractResponse(response);
     }
 
     @Override

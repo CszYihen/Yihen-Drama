@@ -2,9 +2,12 @@ package com.yihen.core.model.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.yihen.asyn.EpisodePersistFacade;
+import com.yihen.constant.characters.CharactersMQConstant;
+import com.yihen.constant.episode.EpisodeMQConstant;
 import com.yihen.controller.vo.*;
 import com.yihen.core.model.strategy.video.VideoModelFactory;
 import com.yihen.core.model.strategy.video.VideoModelStrategy;
+import com.yihen.util.CheckUtils;
 import com.yihen.util.UrlUtils;
 import com.yihen.config.properties.MinioProperties;
 import com.yihen.constant.MinioConstant;
@@ -16,6 +19,7 @@ import com.yihen.http.HttpExecutor;
 import com.yihen.service.*;
 import com.yihen.core.model.InfoExtractTextModelService;
 import com.yihen.util.MinioUtil;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +40,8 @@ public class EpisodeExtractOrchestrator {
     @Autowired
     private EpisodeService episodeService;
 
-
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
     private InfoExtractTextModelService infoExtractService;
@@ -102,6 +107,9 @@ public class EpisodeExtractOrchestrator {
         // 创建异步任务，异步更新数据库
         episodePersistFacade.updateEpisodeCurrentStepAsync(episode,EpisodeStep.EXTRACT_INFO);
 
+        //  发送消息 章节内容存入向量数据库
+        rabbitTemplate.convertAndSend(EpisodeMQConstant.EPISODE_EXCHANGE, EpisodeMQConstant.EPISODE_VECTOR_ADD_KEY, episode);
+
 
         return extract;
     }
@@ -121,6 +129,8 @@ public class EpisodeExtractOrchestrator {
             Consumer<Characters> onSuccess,
             BiConsumer<CharactersRequestVO, Throwable> onError
     ) {
+
+
         if (ObjectUtils.isEmpty(requestList)) {
             throw new RuntimeException("批量生成人物请求不能为空");
         }

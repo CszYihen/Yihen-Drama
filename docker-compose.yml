@@ -113,6 +113,18 @@ services:
     ports:
       - "5601:5601"
 
+  qdrant:
+    image: qdrant/qdrant:v1.12.6
+    container_name: yihen-qdrant
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
   backend:
     build:
       context: ./yihen-drama
@@ -133,6 +145,8 @@ services:
         condition: service_started
       es:
         condition: service_healthy
+      qdrant:
+        condition: service_started
     environment:
       TZ: Asia/Shanghai
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/YihenDrama?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2b8
@@ -148,6 +162,14 @@ services:
       MINIO_END_POINT: http://minio:9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6334
+      QDRANT_COLLECTION_NAME: novel_content
+      QDRANT_DIMENSION: 384
+      QDRANT_MAX_SEGMENTSIZE_IN_TOKENS: 300
+      QDRANT_MAX_OVERLAP_SIZE_IN_TOKENS: 30
+      QDRANT_MAX_RESULT: 5
+      QDRANT_MIN_SCORE: 0.8
     ports:
       - "8080:8080"
 
@@ -170,3 +192,4 @@ volumes:
   redis_data:
   minio_data:
   es_data:
+  qdrant_data:

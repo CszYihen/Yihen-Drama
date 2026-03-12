@@ -12,6 +12,8 @@ import com.yihen.entity.Scene;
 import com.yihen.enums.EpisodeStep;
 import com.yihen.mapper.EpisodeMapper;
 import com.yihen.service.*;
+import com.yihen.util.CheckUtils;
+import jakarta.servlet.annotation.WebFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 @Service("episodeServiceImpl")
 public class EpisodeServiceImpl extends ServiceImpl<EpisodeMapper, Episode> implements EpisodeService {
 
@@ -50,15 +51,10 @@ public class EpisodeServiceImpl extends ServiceImpl<EpisodeMapper, Episode> impl
     @Override
     public Episode createEpisode(EpisodeCreateRequestVO episodeCreateRequestVO) {
         // 合法性校验
-        if (ObjectUtils.isEmpty(episodeCreateRequestVO.getName())) {
-            throw new RuntimeException("章节名称不可为空");
-        }
-        if (ObjectUtils.isEmpty(episodeCreateRequestVO.getProjectId())) {
-            throw new RuntimeException("项目ID不可为空");
-        }
-        if (ObjectUtils.isEmpty(episodeCreateRequestVO.getChapterNumber())) {
-            throw new RuntimeException("章节序号不可为空");
-        }
+        CheckUtils.validateRequeried(episodeCreateRequestVO::getName,"章节名称不可为空");
+        CheckUtils.validateRequeried(episodeCreateRequestVO::getProjectId,"项目ID不可为空");
+        CheckUtils.validateRequeried(episodeCreateRequestVO::getChapterNumber,"章节序号不可为空");
+
 
         // 实体构建
         Episode episode = new Episode();
@@ -73,11 +69,6 @@ public class EpisodeServiceImpl extends ServiceImpl<EpisodeMapper, Episode> impl
 
         // 修改项目章节数量
         episodePersistFacade.addEpisodeCountAsync(episode.getProjectId());
-
-//        CompletableFuture.runAsync(() -> {
-//            projectService.addEpisodeCount(episode.getProjectId());
-//        }, EXECUTORSERVICE);
-
 
         return episode;
     }
